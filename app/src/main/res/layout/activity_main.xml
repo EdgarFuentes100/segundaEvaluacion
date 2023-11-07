@@ -18,7 +18,7 @@
         android:layout_marginTop="34dp"
         android:layout_marginEnd="48dp"
         android:layout_marginBottom="52dp"
-        android:layout_toStartOf="@+id/btnDividir"
+        android:layout_toStartOf="@+id/btnCompra"
         android:text="Mis Compras"
         android:textSize="20sp"
         android:textStyle="bold" />

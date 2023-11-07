@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.segundaevaluacion.R;
 
 public class viewHolderActiva  extends RecyclerView.ViewHolder {
-    private TextView tvTitulo, tvPresupuesto;
+    private TextView tvTitulo;
 
     public TextView getTvTitulo() {
         return tvTitulo;

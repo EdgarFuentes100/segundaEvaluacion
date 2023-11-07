@@ -1,4 +1,4 @@
-package com.example.segundaevaluacion.Adapters;
+package com.example.segundaevaluacion.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
