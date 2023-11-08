@@ -1,18 +1,42 @@
 package com.example.segundaevaluacion.UI;
+import static com.example.segundaevaluacion.TODOApplication.firebaseFirestore;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.segundaevaluacion.R;
+import com.example.segundaevaluacion.adapters.ADListaCompras;
+import com.example.segundaevaluacion.clases.CompraDetalle;
 import com.example.segundaevaluacion.clases.Compras;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 
-public class ComprasDiarias extends AppCompatActivity {
+import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class ComprasDiarias extends AppCompatActivity implements ADListaCompras.OnItemClickListener {
+
+    RecyclerView rcvDetalles;
     TextView tvPresupuesto, tvTotal;
     EditText edtNombre, edtCantidad, edtPrecio;
     Button btnGuardar, btnAgregar;
+    private LinearLayoutManager layoutManager;
+    ADListaCompras detallesAdapter;
+    List<CompraDetalle> detallesList = new ArrayList<>();
+    private Compras compra;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,13 +49,15 @@ public class ComprasDiarias extends AppCompatActivity {
         edtPrecio = findViewById(R.id.edtPrecio);
         btnAgregar = findViewById(R.id.btnAgregar);
         btnGuardar = findViewById(R.id.btnGuadar);
+        rcvDetalles = findViewById(R.id.rcvCarrito);
 
+        CargarDetalles();
         // Recupera el Bundle del Intent
         Bundle bundle = getIntent().getExtras();
 
         if (bundle != null) {
             // Recupera el objeto Compras del Bundle
-            Compras compra = bundle.getParcelable("compra");
+            compra = bundle.getParcelable("compra");
 
             // Realiza operaciones con el objeto Compras
             if (compra != null) {
@@ -39,5 +65,106 @@ public class ComprasDiarias extends AppCompatActivity {
                 tvTotal.setText(compra.getTotal() + "");
             }
         }
+
+        btnAgregar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AgregarProductos(compra);
+            }
+        });
+
+        btnGuardar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CompletarCompra(compra);
+            }
+        });
+
+    }
+
+    private void AgregarProductos(Compras compra) {
+
+        if(edtNombre.getText().toString().equals("")){
+            Toast.makeText(this, "Escriba un nombre.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(edtCantidad.getText().toString().equals("")){
+            Toast.makeText(this, "Escriba la cantidad.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(edtPrecio.getText().toString().equals("")){
+            Toast.makeText(this, "Escriba el precio.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double total = LlenarLista();
+        //Establecer el total
+        tvTotal.setText(total + "");
+
+    }
+
+    private void CompletarCompra(Compras compra){
+        ActualizarCompra(compra);
+        finish();
+    }
+
+    private void ActualizarCompra(Compras compra) {
+        // Supongamos que tienes el ID del documento que deseas editar y los nuevos datos en una Compras objeto llamado "nuevaCompra".
+
+        // Crea un mapa con los nuevos datos que deseas actualizar en el documento.
+        Map<String, Object> datosActualizados = new HashMap<>();
+        datosActualizados.put("titulo", compra.getTitulo());
+        datosActualizados.put("presupuesto", compra.getPresupuesto());
+        datosActualizados.put("activa", false);
+        datosActualizados.put("total", compra.getTotal());
+
+        // Accede al documento por su ID y actualiza los datos.
+        firebaseFirestore.collection("compras")
+                .document(String.valueOf(compra.getIdCompra()))  // Utiliza el método "document" para acceder al documento por su ID.
+                .update(datosActualizados)  // Utiliza el método "update" para actualizar los datos.
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Maneja el éxito de la actualización
+                        Toast.makeText(ComprasDiarias.this, "Documento actualizado con éxito", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Maneja el error al actualizar el documento
+                        Toast.makeText(ComprasDiarias.this, "Ocurrió un problema al actualizar el documento: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        System.out.println("ERROR: " + e.getMessage());
+                    }
+                });
+
+    }
+
+    private void CargarDetalles(){
+        // Configurando adaptador
+        detallesAdapter = new ADListaCompras(detallesList, ComprasDiarias.this);
+        layoutManager = new LinearLayoutManager(this);
+        rcvDetalles.setAdapter(detallesAdapter);
+        rcvDetalles.setLayoutManager(layoutManager);
+        rcvDetalles.setHasFixedSize(true);
+    }
+
+    private double LlenarLista(){
+        double total = Double.parseDouble(tvTotal.getText().toString());
+        CompraDetalle detalle = new CompraDetalle();
+        detalle.setIdCompra(compra.getIdCompra());
+        detalle.setNombre(edtNombre.getText().toString());
+        detalle.setCantidad(Integer.parseInt(edtCantidad.getText().toString()));
+        detalle.setPrecio(Double.parseDouble(edtPrecio.getText().toString()));
+        total += (detalle.getCantidad()*detalle.getPrecio());
+
+        detallesList.add(detalle);
+        detallesAdapter.notifyDataSetChanged();
+        return total;
+    }
+
+    @Override
+    public void onItemClick(CompraDetalle detalle) {
+
     }
 }

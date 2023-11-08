@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import com.example.segundaevaluacion.R;
 import com.example.segundaevaluacion.adapters.ADListaActiva;
+import com.example.segundaevaluacion.adapters.ADListaCompleta;
 import com.example.segundaevaluacion.clases.Compras;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -33,9 +34,11 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements  ADListaActiva.OnItemClickListener{
     Button btnCompra;
     BottomSheetDialog dialogo;
-    RecyclerView rcvCompras;
-    ADListaActiva comprasAdapter;
-    List<Compras> comprasList = new ArrayList<>();
+    RecyclerView rcvComprasActivas, rcvComprasCompletas;
+    ADListaActiva comprasActivasAdapter;
+    ADListaCompleta comprasCompletasAdapter;
+    List<Compras> comprasActivasList = new ArrayList<>();
+    List<Compras> comprasCompletasList = new ArrayList<>();
     private LinearLayoutManager layoutManager;
 
     @Override
@@ -46,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements  ADListaActiva.On
         btnCompra = findViewById(R.id.btnCompra);
 
         dialogo = new BottomSheetDialog(this);
+        ConfigurarAdaptadorComprasActivas();
+        ConfigurarAdaptadorComprasCompletas();
 
         btnCompra.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,18 +63,14 @@ public class MainActivity extends AppCompatActivity implements  ADListaActiva.On
         Button btnGuardar = v.findViewById(R.id.btnGuardar);
         EditText edtPresupuesto = v.findViewById(R.id.edtPresupuesto);
         EditText edtTitulo = v.findViewById(R.id.edtTitulo);
-        CrearDialogo(v);
+        dialogo.setContentView(v);
+        ActualizarCompras();
         Compras nuevaCompra = new Compras();
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialogo.dismiss();
                 if(!edtPresupuesto.getText().equals("") && !edtTitulo.getText().equals("")){
-                    if(comprasList != null){
-                        nuevaCompra.setIdCompra(comprasList.size() + 1);
-                    }else{
-                        nuevaCompra.setIdCompra(1);
-                    }
 
                     nuevaCompra.setTitulo(edtTitulo.getText().toString());
                     nuevaCompra.setPresupuesto(Double.parseDouble(edtPresupuesto.getText().toString()));
@@ -83,35 +84,21 @@ public class MainActivity extends AppCompatActivity implements  ADListaActiva.On
                     compra.put("total", nuevaCompra.getTotal());
                     // Add a new document with a generated ID
                     firebaseFirestore.collection("compras")
-                            .add(compra)
-                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference)
-                                {
-                                    firebaseFirestore.collection("compras")
-                                            .get()
-                                            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-
-                                                    CargarCompras(queryDocumentSnapshots);
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    // Maneja el error de recuperación de datos
-                                                }
-                                            });
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    //Log.w(TAG, "Error adding document", e);
-                                    Toast.makeText(MainActivity.this, "Ocurrio problema" + e, Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                    .add(compra)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference)
+                        {
+                            ActualizarCompras();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //Log.w(TAG, "Error adding document", e);
+                            Toast.makeText(MainActivity.this, "Ocurrio problema" + e, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });
@@ -120,23 +107,22 @@ public class MainActivity extends AppCompatActivity implements  ADListaActiva.On
 
     }
 
-
-    private void CrearDialogo(View v) {
+    private void ActualizarCompras() {
         firebaseFirestore.collection("compras")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        CargarCompras(queryDocumentSnapshots);
-                        dialogo.setContentView(v);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Maneja el error de recuperación de datos
-                    }
-                });
+        .get()
+        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                CargarCompras(queryDocumentSnapshots);
+            }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Maneja el error de recuperación de datos
+            }
+        });
     }
 
     private void borrarTodosLosDocumentos() {
@@ -162,9 +148,10 @@ public class MainActivity extends AppCompatActivity implements  ADListaActiva.On
 
     private void CargarCompras(QuerySnapshot queryDocumentSnapshots){
         if(queryDocumentSnapshots.size() > 0){
-            comprasList.clear();
+            comprasActivasList.clear();
+            comprasCompletasList.clear();
             for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                int idCompra = Math.toIntExact(document.getLong("idCompra"));
+                String idCompra = document.getId();
                 String titulo = document.getString("titulo");
                 double presupuesto = document.getDouble("presupuesto");
                 double total = document.getDouble("total");
@@ -176,18 +163,37 @@ public class MainActivity extends AppCompatActivity implements  ADListaActiva.On
                 compra.setPresupuesto(presupuesto);
                 compra.setActiva(activa);
                 compra.setTotal(total);
-                comprasList.add(compra);
-            }
+                if(compra.isActiva()){
+                    comprasActivasList.add(compra);
+                } else{
+                    comprasCompletasList.add(compra);
+                }
 
-            // Configurando adaptador
-            comprasAdapter = new ADListaActiva(comprasList, MainActivity.this);
-            layoutManager = new LinearLayoutManager(this);
-            rcvCompras = findViewById(R.id.rcvActivas);
-            rcvCompras.setAdapter(comprasAdapter);
-            rcvCompras.setLayoutManager(layoutManager);
-            rcvCompras.setHasFixedSize(true);
+            }
+            comprasActivasAdapter.notifyDataSetChanged();
+            comprasCompletasAdapter.notifyDataSetChanged();
         }
 
+    }
+
+    private void ConfigurarAdaptadorComprasActivas(){
+        // Configurando adaptador
+        comprasActivasAdapter = new ADListaActiva(comprasActivasList, MainActivity.this);
+        layoutManager = new LinearLayoutManager(this);
+        rcvComprasActivas = findViewById(R.id.rcvActivas);
+        rcvComprasActivas.setAdapter(comprasActivasAdapter);
+        rcvComprasActivas.setLayoutManager(layoutManager);
+        rcvComprasActivas.setHasFixedSize(true);
+    }
+
+    private void ConfigurarAdaptadorComprasCompletas(){
+        // Configurando adaptador
+        comprasCompletasAdapter = new ADListaCompleta(comprasCompletasList);
+        layoutManager = new LinearLayoutManager(this);
+        rcvComprasCompletas = findViewById(R.id.rcvCompletas);
+        rcvComprasCompletas.setAdapter(comprasCompletasAdapter);
+        rcvComprasCompletas.setLayoutManager(layoutManager);
+        rcvComprasCompletas.setHasFixedSize(true);
     }
 
     @Override
@@ -206,5 +212,9 @@ public class MainActivity extends AppCompatActivity implements  ADListaActiva.On
         startActivity(intent);
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ActualizarCompras();
+    }
 }

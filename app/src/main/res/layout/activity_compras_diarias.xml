@@ -1,156 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="16dp">
-    <TextView
-        android:id="@+id/tvComprasDiarias"
-        android:layout_width="236dp"
-        android:layout_height="38dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="17dp"
-        android:layout_marginEnd="48dp"
-        android:layout_marginBottom="52dp"
-        android:text="Mis compras diarias"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-    <EditText
-        android:id="@+id/edtCantidd"
-        android:layout_width="354dp"
-        android:layout_height="53dp"
-        android:layout_above="@+id/rcvCarrito"
-        android:layout_marginStart="10sp"
-        android:layout_marginLeft="10sp"
-        android:layout_marginEnd="10sp"
-        android:layout_marginRight="10sp"
-        android:layout_marginBottom="106dp"
-        android:hint="Cantidad"
-        android:textSize="19sp" />
-    <EditText
-        android:id="@+id/edtPrecio"
-        android:layout_width="354dp"
-        android:layout_height="53dp"
-        android:layout_above="@+id/rcvCarrito"
-        android:layout_marginStart="10sp"
-        android:layout_marginLeft="10sp"
-        android:layout_marginEnd="10sp"
-        android:layout_marginRight="10sp"
-        android:layout_marginBottom="167dp"
-        android:hint="Precio"
-        android:textSize="19sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="71dp"
+        android:orientation="horizontal"
+        android:textAlignment="center">
+
+        <TextView
+            android:id="@+id/tvComprasDiarias"
+            android:layout_width="0dp"
+            android:layout_height="71dp"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="16dp"
+            android:gravity="start"
+            android:text="Mis compras diarias"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnAgregar"
+            android:layout_width="62dp"
+            android:layout_height="72dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:text="+"
+            android:textSize="30dp" />
+    </LinearLayout>
+
+
     <EditText
         android:id="@+id/edtNombre"
-        android:layout_width="354dp"
-        android:layout_height="53dp"
-        android:layout_above="@+id/rcvCarrito"
-        android:layout_marginStart="10sp"
-        android:layout_marginLeft="10sp"
-        android:layout_marginEnd="10sp"
-        android:layout_marginRight="10sp"
-        android:layout_marginBottom="231dp"
-        android:hint="Nombre"
-        android:textSize="19sp" />
-
-    <TextView
-        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/rcvCarrito"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="290dp"
-        android:padding="5dp"
-        android:text="ARTICULO"
-        android:textSize="15sp"
-        android:textStyle="bold" />
+        android:hint="Nombre"
+        android:textSize="20sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/edtPrecio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Precio"
+        android:inputType="number|numberDecimal"
+        android:textSize="20sp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/edtCantidd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Cantidad"
+        android:inputType="number"
+        android:textSize="20sp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 
     <Button
         android:id="@+id/btnGuadar"
         android:layout_width="wrap_content"
-        android:layout_height="57dp"
-        android:layout_above="@+id/textView1"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
+        android:layout_height="wrap_content"
+        android:text="Guardar"
         android:layout_gravity="center_horizontal"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="286dp"
-        android:layout_marginEnd="198dp"
-        android:layout_marginBottom="16dp"
-        android:text="Guardar" />
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/tvPresupuesto"
-        android:layout_width="127dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="238dp"
-        android:layout_marginTop="307dp"
         android:hint="Presupuesto"
-        android:textSize="19sp" />
+        android:textSize="19sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="4dp"
+        android:textAlignment="center"/>
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/rcvCarrito"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="2dp"
-        android:padding="5dp"
         android:text="CARRITO DE COMPRAS"
         android:textSize="15sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcvCarrito"
         android:layout_width="match_parent"
         android:layout_height="175dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="-4dp"
-        android:layout_marginBottom="133dp" />
-
-    <Button
-        android:id="@+id/btnAgregar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="14dp"
-        android:layout_marginBottom="-8dp"
-        android:text="+"
-        android:textAlignment="center"
-        android:textSize="30dp" />
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/tvTotal"
-        android:layout_width="124dp"
-        android:layout_height="45dp"
-        android:layout_below="@+id/btnAgregar"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="226dp"
-        android:layout_marginTop="514dp"
-        android:layout_marginEnd="29dp"
-        android:layout_marginBottom="73dp"
+        android:layout_width="wrap_content"
+        android:layout_height="31dp"
+        android:layout_gravity="right"
+        android:layout_marginBottom="16dp"
         android:hint="Total"
-        android:textAlignment="center"
         android:textSize="24sp" />
-</RelativeLayout>
+</LinearLayout>

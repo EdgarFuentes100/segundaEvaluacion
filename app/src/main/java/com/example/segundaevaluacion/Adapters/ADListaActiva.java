@@ -16,8 +16,8 @@ public class ADListaActiva extends RecyclerView.Adapter<viewHolderActiva> {
     private OnItemClickListener onItemClickListener;
     private List<Compras> datos;
 
-    public ADListaActiva(List<Compras> querySnapshot, OnItemClickListener itemClickListener) {
-        this.datos = querySnapshot;
+    public ADListaActiva(List<Compras> datos, OnItemClickListener itemClickListener) {
+        this.datos = datos;
         this.onItemClickListener = itemClickListener;
     }
 

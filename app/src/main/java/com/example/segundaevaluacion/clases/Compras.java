@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 public class Compras implements Parcelable {
-    int idCompra;
+    String idCompra;
     String titulo;
     double presupuesto;
     boolean activa;
@@ -16,7 +16,7 @@ public class Compras implements Parcelable {
     }
 
     protected Compras(Parcel in) {
-        idCompra = in.readInt();
+        idCompra = in.readString();
         titulo = in.readString();
         presupuesto = in.readDouble();
         activa = in.readByte() != 0;
@@ -43,11 +43,11 @@ public class Compras implements Parcelable {
         this.total = total;
     }
 
-    public int getIdCompra() {
+    public String getIdCompra() {
         return idCompra;
     }
 
-    public void setIdCompra(int idCompra) {
+    public void setIdCompra(String idCompra) {
         this.idCompra = idCompra;
     }
 
@@ -82,7 +82,7 @@ public class Compras implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeInt(idCompra);
+        dest.writeString(idCompra);
         dest.writeString(titulo);
         dest.writeDouble(presupuesto);
         dest.writeByte((byte) (activa ? 1 : 0));

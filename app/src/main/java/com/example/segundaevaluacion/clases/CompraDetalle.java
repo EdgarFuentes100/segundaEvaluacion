@@ -2,7 +2,7 @@ package com.example.segundaevaluacion.clases;
 
 public class CompraDetalle {
     int idDetalle;
-    int idCompra;
+    String idCompra;
     String nombre;
     double precio;
     int cantidad;
@@ -19,11 +19,11 @@ public class CompraDetalle {
         this.idDetalle = idDetalle;
     }
 
-    public int getIdCompra() {
+    public String getIdCompra() {
         return idCompra;
     }
 
-    public void setIdCompra(int idCompra) {
+    public void setIdCompra(String idCompra) {
         this.idCompra = idCompra;
     }
 
