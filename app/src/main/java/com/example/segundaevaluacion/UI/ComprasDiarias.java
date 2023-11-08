@@ -76,7 +76,12 @@ public class ComprasDiarias extends AppCompatActivity implements ADListaCompras.
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CompletarCompra(compra);
+                if(detallesList.size()>0){
+                    CompletarCompra(compra);
+                }else{
+                    Toast.makeText(ComprasDiarias.this, "Para completar debe al menos agregar un producto.", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
@@ -97,9 +102,14 @@ public class ComprasDiarias extends AppCompatActivity implements ADListaCompras.
             return;
         }
 
-        double total = LlenarLista();
+        double total = LlenarLista(compra);
         //Establecer el total
-        tvTotal.setText(total + "");
+        if(total==0){
+            Toast.makeText(this, "La compra sobrepasa a el presupuesto", Toast.LENGTH_SHORT).show();
+        } else{
+            tvTotal.setText(total + "");
+        }
+
 
     }
 
@@ -114,7 +124,7 @@ public class ComprasDiarias extends AppCompatActivity implements ADListaCompras.
         // Crea un mapa con los nuevos datos que deseas actualizar en el documento.
         Map<String, Object> datosActualizados = new HashMap<>();
         datosActualizados.put("titulo", compra.getTitulo());
-        datosActualizados.put("presupuesto", compra.getPresupuesto());
+        datosActualizados.put("presupuesto", compra.getPresupuesto()-compra.getTotal());
         datosActualizados.put("activa", false);
         datosActualizados.put("total", compra.getTotal());
 
@@ -126,7 +136,7 @@ public class ComprasDiarias extends AppCompatActivity implements ADListaCompras.
                     @Override
                     public void onSuccess(Void aVoid) {
                         // Maneja el éxito de la actualización
-                        Toast.makeText(ComprasDiarias.this, "Documento actualizado con éxito", Toast.LENGTH_SHORT).show();
+                        AgregarDetalles();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -140,6 +150,32 @@ public class ComprasDiarias extends AppCompatActivity implements ADListaCompras.
 
     }
 
+    private void AgregarDetalles() {
+        for (CompraDetalle lista: detallesList) {
+            Map<String, Object> compraDetalle = new HashMap<>();
+            compraDetalle.put("idCompra", lista.getIdCompra());
+            compraDetalle.put("nombre", lista.getNombre());
+            compraDetalle.put("precio", lista.getPrecio());
+            compraDetalle.put("cantidad", lista.getCantidad());
+            firebaseFirestore.collection("compradetalle")
+                    .add(compraDetalle)
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference)
+                        {
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            //Log.w(TAG, "Error adding document", e);
+                            Toast.makeText(ComprasDiarias.this, "Ocurrio problema" + e, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    }
+
     private void CargarDetalles(){
         // Configurando adaptador
         detallesAdapter = new ADListaCompras(detallesList, ComprasDiarias.this);
@@ -149,18 +185,23 @@ public class ComprasDiarias extends AppCompatActivity implements ADListaCompras.
         rcvDetalles.setHasFixedSize(true);
     }
 
-    private double LlenarLista(){
+    private double LlenarLista(Compras compra){
         double total = Double.parseDouble(tvTotal.getText().toString());
         CompraDetalle detalle = new CompraDetalle();
-        detalle.setIdCompra(compra.getIdCompra());
+        detalle.setIdCompra(this.compra.getIdCompra());
         detalle.setNombre(edtNombre.getText().toString());
         detalle.setCantidad(Integer.parseInt(edtCantidad.getText().toString()));
         detalle.setPrecio(Double.parseDouble(edtPrecio.getText().toString()));
         total += (detalle.getCantidad()*detalle.getPrecio());
 
-        detallesList.add(detalle);
-        detallesAdapter.notifyDataSetChanged();
-        return total;
+        if(compra.getPresupuesto()>=total){
+            detallesList.add(detalle);
+            detallesAdapter.notifyDataSetChanged();
+            return total;
+        }else{
+            return 0;
+        }
+
     }
 
     @Override
