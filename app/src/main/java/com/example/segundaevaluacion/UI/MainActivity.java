@@ -90,6 +90,9 @@ public class MainActivity extends AppCompatActivity implements  ADListaActiva.On
                         public void onSuccess(DocumentReference documentReference)
                         {
                             ActualizarCompras();
+                            // Limpiar los EditText después de la inserción exitosa
+                            edtTitulo.setText("");
+                            edtPresupuesto.setText("");
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

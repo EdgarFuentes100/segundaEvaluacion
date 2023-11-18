@@ -107,6 +107,9 @@ public class ComprasDiarias extends AppCompatActivity implements ADListaCompras.
         if(total==0){
             Toast.makeText(this, "La compra sobrepasa a el presupuesto", Toast.LENGTH_SHORT).show();
         } else{
+            edtCantidad.setText("");
+            edtNombre.setText("");
+            edtPrecio.setText("");
             tvTotal.setText(total + "");
         }
 
